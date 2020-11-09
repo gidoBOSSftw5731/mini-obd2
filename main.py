@@ -31,13 +31,16 @@ display.fill(0)
 
 
 while True:
-	out = re.findall("\d+\.\d+", connection.query(obd.commands["SPEED"].value))
+	val = connection.query(obd.commands["SPEED"]).value
+	print(val)
+	out = re.findall("\d+\.\d+", str(val))
 
 	if len(out) == 0:
-		display.print(" 0ff")
+		display.print(str(" 0ff")[::-1])
+		time.sleep(.2)
 		continue
 
-	display.print("0000" + str(int(round(out, 0))))
+	display.print("0000" + str(float(str(out[0]))*0.621371)[::-1])
 
 #	print(round(x,0))
 #	print(x)
