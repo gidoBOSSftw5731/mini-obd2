@@ -3,6 +3,21 @@ import datetime
 from adafruit_ht16k33 import segments
 import board
 import busio
+import obd
+import re
+
+#setup connection to bt obd crap
+obd.logger.setLevel(obd.logging.DEBUG)
+ports = obd.scan_serial()
+if len(ports) == 0:
+	time.sleep(1)
+	raise Exception("no bt things!")
+#guess we found a serial thing now
+
+#open it up for real
+connection = obd.OBD(ports[0])
+
+
 
 # Create the I2C interface.
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -14,12 +29,20 @@ display = segments.Seg7x4(i2c)
 # clear display
 display.fill(0)
 
-x = 0
 
 while True:
+	out = re.findall("\d+\.\d+", connection.query(obd.commands["SPEED"].value))
 
-	display.print(str(round(x, 2)))
+	if len(out) == 0:
+		display.print(" 0ff")
+		continue
 
-	x+=.1
+	display.print("0000" + str(int(round(out, 0))))
+
+#	print(round(x,0))
+#	print(x)
+#	x+=1
+
 
 	time.sleep(0.1)
+#	input("enter for next")
